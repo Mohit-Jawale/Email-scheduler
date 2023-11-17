@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Compose Email</title>
+</head>
+<body>
+<h1>Compose Email</h1>
+<form action="#" th:action="@{/schedule/email}" th:object="${emailForm}" method="post">
+    <p>
+        <label for="email">To:</label>
+        <input type="email" id="email" name="email" th:value="*{email}" required />
+    </p>
+    <p>
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" th:value="*{subject}" required />
+    </p>
+    <p>
+        <label for="body">Message:</label>
+        <textarea id="body" name="body" th:text="*{body}" required></textarea>
+    </p>
+    <p>
+        <label for="dateTime">DateTime:</label>
+        <textarea id="dateTime" name="dateTime" th:text="*{dateTime}" required></textarea>
+    </p>
+    <p>
+        <label for="timeZone">Zone:</label>
+        <textarea id="timeZone" name="timeZone" th:text="*{timeZone}" required></textarea>
+    </p>
+    <p>
+        <button type="submit">Send Email</button>
+    </p>
+</form>
+</body>
+</html>

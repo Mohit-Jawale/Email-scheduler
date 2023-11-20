@@ -29,7 +29,7 @@ public class AuthController {
         // Check if the user exists and the password matches
         if (user != null && user.getPassword().equals(password)) {
             // Authentication successful, you can redirect to a dashboard or home page
-            return "redirect:/dashboard";
+            return "redirect:/composeEmail";
         } else {
             // Authentication failed, add an error message to the model
             model.addAttribute("error", "Invalid email or password");
@@ -37,8 +37,8 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/dashboard")
-    public String showDashboard() {
-        return "dashboard"; // Assuming you have a dashboard.html or dashboard.jsp
-    }
+    // @GetMapping("/emailform")
+    // public String showDashboard() {
+    //     return "emailform"; // Assuming you have a dashboard.html or dashboard.jsp
+    // }
 }

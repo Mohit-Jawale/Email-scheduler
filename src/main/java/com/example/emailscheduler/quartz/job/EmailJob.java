@@ -9,12 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
+import java.io.File;
 
 @Component
 public class EmailJob extends QuartzJobBean {
@@ -33,20 +34,24 @@ public class EmailJob extends QuartzJobBean {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
         String subject = jobDataMap.getString("subject");
         String body = jobDataMap.getString("body");
-        String recipientEmail = jobDataMap.getString("email");
+        String[] recipientEmail = jobDataMap.getString("email").split(",");
+        String pathtoattachment = jobDataMap.getString("attachment");
 
-        sendMail(mailProperties.getUsername(), recipientEmail, subject, body);
+        sendMail(mailProperties.getUsername(), recipientEmail, subject, body,pathtoattachment);
     }
-    private void sendMail(String fromEmail, String toEmail, String subject, String body) {
+    private void sendMail(String fromEmail, String[] toEmail, String subject, String body,String pathToAttachment) {
         try {
             logger.info("Sending Email to {}", toEmail);
             MimeMessage message = mailSender.createMimeMessage();
 
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message, StandardCharsets.UTF_8.toString());
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message,true);
             messageHelper.setSubject(subject);
             messageHelper.setText(body, true);
             messageHelper.setFrom(fromEmail);
             messageHelper.setTo(toEmail);
+
+            FileSystemResource file = new FileSystemResource(new File(pathToAttachment));
+            messageHelper.addAttachment(file.getFilename(), file);
 
             mailSender.send(message);
         } catch (MessagingException ex) {

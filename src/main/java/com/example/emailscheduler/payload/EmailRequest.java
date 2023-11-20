@@ -2,7 +2,6 @@ package com.example.emailscheduler.payload;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -13,9 +12,9 @@ import java.time.ZoneId;
 
 
 public class EmailRequest {
-    @Email
+
     @NotEmpty
-    private String email;
+    String  email;
 
     @NotEmpty
     private String subject;
@@ -27,6 +26,16 @@ public class EmailRequest {
     private LocalDateTime dateTime;
     @NotNull
     private ZoneId timeZone;
+
+    private String attachment;
+
+    public String getAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(String attachment) {
+        this.attachment = attachment;
+    }
 
     public String getEmail() {
         return email;

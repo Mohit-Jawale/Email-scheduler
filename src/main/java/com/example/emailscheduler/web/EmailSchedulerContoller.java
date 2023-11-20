@@ -23,7 +23,7 @@ public class EmailSchedulerContoller {
     private Scheduler scheduler;
 
     @PostMapping("/schedule/email")
-    public ResponseEntity<EmailResponse> scheduleEmail(@Valid @RequestBody @ModelAttribute EmailRequest emailRequest) {
+    public ResponseEntity<EmailResponse> scheduleEmail(@Valid  @RequestBody @ModelAttribute EmailRequest emailRequest) {
         try {
             ZonedDateTime dateTime = ZonedDateTime.of(emailRequest.getDateTime(), emailRequest.getTimeZone());
 
@@ -58,6 +58,7 @@ public class EmailSchedulerContoller {
         jobDataMap.put("email", scheduleEmailRequest.getEmail());
         jobDataMap.put("subject", scheduleEmailRequest.getSubject());
         jobDataMap.put("body", scheduleEmailRequest.getBody());
+        jobDataMap.put("attachment",scheduleEmailRequest.getAttachment());
 
         return JobBuilder.newJob(EmailJob.class)
                 .withIdentity(UUID.randomUUID().toString(), "email-jobs")

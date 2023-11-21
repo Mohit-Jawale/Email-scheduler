@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +33,14 @@
 
     .form {
       padding: 20px;
+    }
+
+    .gui-toast-group {
+    max-inline-size: min(25ch, 90vw);
+  padding-block: .5ch;
+  padding-inline: 1ch;
+  border-radius: 3px;
+  font-size: 1rem;
     }
 
     .form-group {
@@ -114,5 +122,8 @@
 <!--    </div>-->
 </div>
 
+
+    <!-- Display error message if authentication fails -->
+    <output class="gui-toast-group" { th:if="${error}" style="color: red" th:text="${error}"></output>
 </body>
 </html>

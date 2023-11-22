@@ -55,8 +55,16 @@
         button:hover {
             background-color: #3f51b5;
         }
-    </style>
 
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     
@@ -83,7 +91,6 @@
         <label for="timeZone">Zone:</label>
         <select id="timeZone" name="timeZone" required>
             <option value="">Select Timezone</option>
-            <option value="">Select Timezone</option>
             <option value="UTC">UTC (Coordinated Universal Time)</option>
             <option value="America/New_York">America/New_York (Eastern Time)</option>
             <option value="Europe/London">Europe/London (British Time)</option>
@@ -92,7 +99,12 @@
             <option value="Australia/Sydney">Australia/Sydney (Australian Eastern Time)</option>
         </select>
     </p>
-
+    <p>
+        <label for="template">Template:</label>
+        <select id="template" name="template" required>
+            <option th:each="template : ${templates}" th:value="${template.content}" th:text="${template.name}"></option>
+        </select>
+    </p>
     <p>
         <label for="attachment">Path of file to attach:</label>
         <textarea id="attachment" name="attachment" th:text="*{attachment}" Optional></textarea>
@@ -101,5 +113,6 @@
         <button type="submit">Send Email</button>
     </p>
 </form>
+
 </body>
 </html>

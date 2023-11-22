@@ -2,7 +2,12 @@ package com.example.emailscheduler.web;
 
 import com.example.emailscheduler.payload.EmailRequest;
 import com.example.emailscheduler.payload.EmailResponse;
+import com.example.emailscheduler.payload.EmailTemplate;
+
+import com.example.emailscheduler.payload.User;
 import com.example.emailscheduler.quartz.job.EmailJob;
+import com.example.emailscheduler.repository.UserRepository;
+import com.example.emailscheduler.service.EmailTemplateService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -13,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -24,9 +30,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-@RestController
+@Controller
 public class EmailSchedulerContoller {
-
+    private final EmailTemplateService templateService;
     @Autowired
     private Scheduler scheduler;
     @Autowired
@@ -47,9 +53,6 @@ public class EmailSchedulerContoller {
 
         return extractedEmails;
     }
-    public static String loadTemplate(String filePath) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(filePath)));
-    }
 
     @GetMapping("/Recipient")
     public  List<Recipient> getAllEmails(List<String> names){
@@ -65,8 +68,6 @@ public class EmailSchedulerContoller {
         return  recipients;
 
     }
-
-
     @PostMapping("/schedule/email")
     public ResponseEntity<EmailResponse> scheduleEmail(@Valid  @RequestBody @ModelAttribute EmailRequest emailRequest) {
         try {
@@ -76,7 +77,7 @@ public class EmailSchedulerContoller {
             logger.info(onlyEmails.toString());
             List<Recipient> response = getAllEmails(emails);
             List<String> myList = new ArrayList<>();
-
+            ZonedDateTime dateTime = ZonedDateTime.of(emailRequest.getDateTime(), emailRequest.getTimeZone());
             for (Recipient r : response)
             {
                 myList.add(r.getEmail_address());
@@ -85,28 +86,15 @@ public class EmailSchedulerContoller {
             String result = String.join(",", myList);
             logger.info("This is result-:"+result);
             emailRequest.setEmail(result);
-            try {
-                String htmlTemplate = loadTemplate("src/main/resources/templates/messageTemplate.html");
-                String messageBody = htmlTemplate.replace("${body}",emailRequest.getBody());
-                logger.info(messageBody);
-                emailRequest.setBody(messageBody);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-
-            ZonedDateTime dateTime = ZonedDateTime.of(emailRequest.getDateTime(), emailRequest.getTimeZone());
-
+            User user = userRepository.findByEmail(emailRequest.getEmail());
             if(dateTime.isBefore(ZonedDateTime.now())) {
                 EmailResponse emailResponse = new EmailResponse(false,
                         "dateTime must be after current time");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emailResponse);
             }
 
-            JobDetail jobDetail = buildJobDetail(emailRequest);
+
+            JobDetail jobDetail = buildJobDetail(emailRequest,emailRequest.getTemplate());
             Trigger trigger = buildJobTrigger(jobDetail, dateTime);
             scheduler.scheduleJob(jobDetail, trigger);
 
@@ -125,14 +113,31 @@ public class EmailSchedulerContoller {
     public ResponseEntity<String> getAPiTest(){
         return ResponseEntity.ok("Get ApiTest-Pass");
     }
-    private JobDetail buildJobDetail(EmailRequest scheduleEmailRequest) {
+
+    @GetMapping("/jobs")
+    public String getScheduleEmails(Model model) throws SchedulerException {
+
+        List<JobDataMap> jobs = new ArrayList<>();
+
+        for (String groupName : scheduler.getJobGroupNames()) {
+
+            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+                jobs.add(scheduler.getJobDetail(jobKey).getJobDataMap());
+            }
+        }
+        model.addAttribute("jobs", jobs);
+        return "jobs";
+      // return ResponseEntity.ok(jobs);
+    }
+
+    private JobDetail buildJobDetail(EmailRequest scheduleEmailRequest, String emailTemplate) {
         JobDataMap jobDataMap = new JobDataMap();
 
         jobDataMap.put("email", scheduleEmailRequest.getEmail());
         jobDataMap.put("subject", scheduleEmailRequest.getSubject());
         jobDataMap.put("body", scheduleEmailRequest.getBody());
         jobDataMap.put("attachment",scheduleEmailRequest.getAttachment());
-
+        jobDataMap.put("template",emailTemplate);
         return JobBuilder.newJob(EmailJob.class)
                 .withIdentity(UUID.randomUUID().toString(), "email-jobs")
                 .withDescription("Send Email Job")

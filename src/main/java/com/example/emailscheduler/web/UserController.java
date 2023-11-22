@@ -35,4 +35,11 @@ public class UserController {
         model.addAttribute("users", users);
         return "dropdown"; // Name of your Thymeleaf template
     }
+    
+    @GetMapping("/logout")
+    public String logout() {
+        // Perform any necessary logout logic here (e.g., invalidate session, clear authentication)
+        // For simplicity, we'll just return the "logout" template
+        return "logout"; // Name of your Thymeleaf template for the logout page
+    }
 }

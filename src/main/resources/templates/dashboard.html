@@ -103,11 +103,22 @@ footer {
 <body>
 <header>
     <h1>Email Dashboard</h1>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div class="logout-button">
+        <form th:action="@{/logout}" method="get">
+            <button type="submit">
+                <h2>Logout</h2>
+                <p>Logout from your account.</p>
+            </button>
+        </form>
+    </div>
 </header>
+
 
 <div class="container">
     <div class="dashboard">
         <div class="dashboard-option">
+            
             <form th:action="@{/composeEmail}" method="get">
                 <button type="submit">
             <h2>Compose Email</h2>
@@ -126,7 +137,7 @@ footer {
         </div>
 
         <div class="dashboard-option">
-            <form th:action="@{/composeEmail}" method="get">
+            <form th:action="@{/addRecipient}" method="get">
                 <button type="submit">
                     <h2>Manage Recipients</h2>
             <p>Manage your email recipients here.</p>

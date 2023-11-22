@@ -29,6 +29,12 @@ public class User {
     private String password;
 
 
+
+
+    @ManyToOne
+    @JoinColumn(name = "template_id")
+    private EmailTemplate emailTemplate;
+
     public EmailTemplate getEmailTemplate() {
         return emailTemplate;
     }
@@ -36,11 +42,6 @@ public class User {
     public void setEmailTemplate(EmailTemplate emailTemplate) {
         this.emailTemplate = emailTemplate;
     }
-
-    @ManyToOne
-    @JoinColumn(name = "template_id")
-    private EmailTemplate emailTemplate;
-
 
     public Long getId() {
         return id;

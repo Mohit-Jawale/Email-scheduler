@@ -1,4 +1,4 @@
-package com.example.emailscheduler.web;
+package com.example.emailscheduler.repository;
 
 
 public class Recipient {

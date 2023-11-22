@@ -2,15 +2,17 @@ package com.example.emailscheduler.web;
 
 import com.example.emailscheduler.payload.EmailRequest;
 import com.example.emailscheduler.payload.EmailResponse;
-import com.example.emailscheduler.payload.EmailTemplate;
 
+import com.example.emailscheduler.payload.EmailTemplate;
 import com.example.emailscheduler.payload.User;
 import com.example.emailscheduler.quartz.job.EmailJob;
+import com.example.emailscheduler.repository.Recipient;
 import com.example.emailscheduler.repository.UserRepository;
 import com.example.emailscheduler.service.EmailTemplateService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -31,13 +31,20 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Controller
-public class EmailSchedulerContoller {
+public class EmailSchedulerController {
     private final EmailTemplateService templateService;
     @Autowired
     private Scheduler scheduler;
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(EmailJob.class);
+
+    public EmailSchedulerController(EmailTemplateService templateService) {
+        this.templateService = templateService;
+    }
 
     public static List<String> extractEmails(List<String> inputStrings) {
         List<String> extractedEmails = new ArrayList<>();
@@ -68,8 +75,62 @@ public class EmailSchedulerContoller {
         return  recipients;
 
     }
+
+
+
+
+//    @PostMapping("/{userId}/template/{templateId}")
+//    public ResponseEntity<String> associateTemplateWithUser(
+//            @PathVariable Long userId,
+//            @PathVariable Long templateId) {
+//
+//        try {
+//            // Retrieve user and email template based on the provided IDs
+//            User user = userService.getUserById(userId);
+//            EmailTemplate emailTemplate = emailTemplateService.getEmailTemplateById(templateId);
+//
+//            // Associate the email template with the user
+//            user.setEmailTemplate(emailTemplate);
+//
+//            // Save the updated user entity
+//            userService.saveUser(user);
+//
+//            return ResponseEntity.ok("Template associated with user successfully.");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Error associating template with user.");
+//        }
+//    }
+
+    @GetMapping("/templates/{templateId}")
+    public String viewEmailTemplateDetails(@PathVariable Long templateId, Model model) {
+        EmailTemplate template = templateService.getTemplateById(templateId);
+
+        if (template != null) {
+            model.addAttribute("template", template);
+            return "emailtemplate";
+        } else {
+            // Handle the case when the template is not found
+            return "redirect:/templates"; // Redirect to the list of templates or handle appropriately
+        }
+    }
+
+    @GetMapping("/templates")
+    public String getAllTemplates(Model model) {
+        List<EmailTemplate> templates = templateService.findAll();
+        model.addAttribute("templates", templates);
+        return "templatelist";
+      //  return new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+
+    @GetMapping("/getTemplates")
+    public ResponseEntity<List<EmailTemplate>> getlTemplateList(Model model) {
+        List<EmailTemplate> templates = templateService.findAll();
+        model.addAttribute("templates", templates);
+         return new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+
     @PostMapping("/schedule/email")
-    public ResponseEntity<EmailResponse> scheduleEmail(@Valid  @RequestBody @ModelAttribute EmailRequest emailRequest) {
+    public String scheduleEmail(@Valid  @RequestBody @ModelAttribute EmailRequest emailRequest) {
         try {
             List<String> emails = Arrays.asList(emailRequest.getEmail().split(","));
 
@@ -90,7 +151,7 @@ public class EmailSchedulerContoller {
             if(dateTime.isBefore(ZonedDateTime.now())) {
                 EmailResponse emailResponse = new EmailResponse(false,
                         "dateTime must be after current time");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emailResponse);
+                return emailResponse.getMessage();
             }
 
 
@@ -100,13 +161,13 @@ public class EmailSchedulerContoller {
 
             EmailResponse emailResponse = new EmailResponse(true,
                     jobDetail.getKey().getName(), jobDetail.getKey().getGroup(), "Email Scheduled Successfully!");
-            return ResponseEntity.ok(emailResponse);
+            return "redirect:/jobs";
         } catch (SchedulerException ex) {
             log.error("Error scheduling email", ex);
 
             EmailResponse emailResponse = new EmailResponse(false,
                     "Error scheduling email. Please try later!");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emailResponse);
+            return emailResponse.getMessage();
         }
     }
     @GetMapping("/get")

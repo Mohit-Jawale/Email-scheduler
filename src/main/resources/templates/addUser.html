@@ -4,6 +4,7 @@
     <title>Add User</title>
 </head>
 <body>
+    <button class="back-button" onclick="history.back()">Back</button>
     <h2>Add User</h2>
     <form action="#" th:action="@{/addUser}" th:object="${user}" method="post">
         <label for="firstName">First Name:</label>

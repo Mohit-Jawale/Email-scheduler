@@ -59,7 +59,9 @@
 
 </head>
 <body>
+    
 <h1>Compose Email</h1>
+<button class="back-button" onclick="history.back()">Back</button>
 <form action="#" th:action="@{/schedule/email}" th:object="${emailForm}" method="post" enctype="multipart/form-data">
     <p>
         <label for="email">To:</label>

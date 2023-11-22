@@ -58,6 +58,7 @@
     </style>
 </head>
 <body>
+    <button class="back-button" onclick="history.back()">Back</button>
     <h2>Add Recipient</h2>
     <form action="#" th:action="@{/addRecipient}" th:object="${recipient}" method="post">
         <label for="name">Name:</label>

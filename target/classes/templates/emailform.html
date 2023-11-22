@@ -56,13 +56,14 @@
             background-color: #3f51b5;
         }
     </style>
+
 </head>
 <body>
 <h1>Compose Email</h1>
 <form action="#" th:action="@{/schedule/email}" th:object="${emailForm}" method="post" enctype="multipart/form-data">
     <p>
         <label for="email">To:</label>
-        <input type="email" id="email" name="email" th:value="*{email}" required />
+        <input type="text" id="email" name="email" th:value="*{email}" required />
     </p>
     <p>
         <label for="subject">Subject:</label>
@@ -74,15 +75,25 @@
     </p>
     <p>
         <label for="dateTime">DateTime:</label>
-        <textarea id="dateTime" name="dateTime" th:text="*{dateTime}" required></textarea>
+        <input type="datetime-local" id="dateTime" name="dateTime" th:value="*{dateTime}" required />
     </p>
     <p>
         <label for="timeZone">Zone:</label>
-        <textarea id="timeZone" name="timeZone" th:text="*{timeZone}" required></textarea>
+        <select id="timeZone" name="timeZone" required>
+            <option value="">Select Timezone</option>
+            <option value="">Select Timezone</option>
+            <option value="UTC">UTC (Coordinated Universal Time)</option>
+            <option value="America/New_York">America/New_York (Eastern Time)</option>
+            <option value="Europe/London">Europe/London (British Time)</option>
+            <option value="Asia/Tokyo">Asia/Tokyo (Japan Time)</option>
+            <option value="America/Los_Angeles">America/Los_Angeles (LA Time)</option>
+            <option value="Australia/Sydney">Australia/Sydney (Australian Eastern Time)</option>
+        </select>
     </p>
+
     <p>
-        <label for="attachment">Attachment:</label>
-        <input type="file" id="attachment" name="attachment" />
+        <label for="attachment">Path of file to attach:</label>
+        <textarea id="attachment" name="attachment" th:text="*{attachment}" Optional></textarea>
     </p>
     <p>
         <button type="submit">Send Email</button>

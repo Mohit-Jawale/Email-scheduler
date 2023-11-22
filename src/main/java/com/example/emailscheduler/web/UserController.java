@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import java.util.List;
+
 
 @Controller
 public class UserController {
@@ -25,5 +27,12 @@ public class UserController {
     public String addUser(@ModelAttribute User user) {
         userRepository.save(user);
         return "redirect:/addUser";
+    }
+    
+    @GetMapping("/dropdown")
+    public String showDropdown(Model model) {
+        List<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+        return "dropdown"; // Name of your Thymeleaf template
     }
 }

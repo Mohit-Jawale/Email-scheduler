@@ -46,7 +46,7 @@ public class EmailJob extends QuartzJobBean {
 
             MimeMessageHelper messageHelper = new MimeMessageHelper(message,true);
             messageHelper.setSubject(subject);
-            messageHelper.setText(body, true);
+            messageHelper.setText(body,true);
             messageHelper.setFrom(fromEmail);
             messageHelper.setTo(toEmail);
             if (!pathToAttachment.isEmpty()) {

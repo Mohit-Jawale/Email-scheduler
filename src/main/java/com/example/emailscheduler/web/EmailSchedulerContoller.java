@@ -15,10 +15,13 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
@@ -43,6 +46,9 @@ public class EmailSchedulerContoller {
         }
 
         return extractedEmails;
+    }
+    public static String loadTemplate(String filePath) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 
     @GetMapping("/Recipient")
@@ -79,6 +85,16 @@ public class EmailSchedulerContoller {
             String result = String.join(",", myList);
             logger.info("This is result-:"+result);
             emailRequest.setEmail(result);
+            try {
+                String htmlTemplate = loadTemplate("src/main/resources/templates/messageTemplate.html");
+                String messageBody = htmlTemplate.replace("${body}",emailRequest.getBody());
+                logger.info(messageBody);
+                emailRequest.setBody(messageBody);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
 
 

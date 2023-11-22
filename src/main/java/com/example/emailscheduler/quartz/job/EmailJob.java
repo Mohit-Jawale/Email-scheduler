@@ -36,7 +36,7 @@ public class EmailJob extends QuartzJobBean {
         String body = jobDataMap.getString("body");
         String[] recipientEmail = jobDataMap.getString("email").split(",");
         String pathtoattachment = jobDataMap.getString("attachment");
-
+        logger.info("Path-:"+pathtoattachment);
         sendMail(mailProperties.getUsername(), recipientEmail, subject, body,pathtoattachment);
     }
     private void sendMail(String fromEmail, String[] toEmail, String subject, String body,String pathToAttachment) {
@@ -49,9 +49,10 @@ public class EmailJob extends QuartzJobBean {
             messageHelper.setText(body, true);
             messageHelper.setFrom(fromEmail);
             messageHelper.setTo(toEmail);
-
-            FileSystemResource file = new FileSystemResource(new File(pathToAttachment));
-            messageHelper.addAttachment(file.getFilename(), file);
+            if (!pathToAttachment.isEmpty()) {
+                FileSystemResource file = new FileSystemResource(new File(pathToAttachment));
+                messageHelper.addAttachment(file.getFilename(), file);
+            }
 
             mailSender.send(message);
         } catch (MessagingException ex) {

@@ -95,30 +95,43 @@ footer {
     width: 100%;
 }
 
+.logout-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: auto; /* Push the logout button to the bottom */
+            align-self: flex-end; /* Align to the right */
+            margin-right:20px;
+            margin-bottom:20px;
+            text-align:center;
 
+        }
 
     </style>
 </head>
 
 <body>
+
 <header>
+    <br><br><br><br><br>
     <h1>Email Dashboard</h1>
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
     <div class="logout-button">
         <form th:action="@{/logout}" method="get">
-            <button type="submit">
+            <button  type="submit" class="logout-button">
                 <h2>Logout</h2>
-                <p>Logout from your account.</p>
             </button>
         </form>
     </div>
 </header>
 
-
 <div class="container">
+
     <div class="dashboard">
         <div class="dashboard-option">
-            
+
             <form th:action="@{/composeEmail}" method="get">
                 <button type="submit">
             <h2>Compose Email</h2>

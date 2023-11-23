@@ -43,7 +43,7 @@
         }
 
         button {
-            background-color: #5c6bc0;
+           background-color: #3498db;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -66,13 +66,14 @@
         }
         back-button{
          color: #3498db;
+        align-self: flex-end;
         }
     </style>
 </head>
 <body>
     
 <h1>Compose Email</h1>
-<button class="back-button" onclick="history.back()">Back</button>
+
 <form action="#" th:action="@{/schedule/email}" th:object="${emailForm}" method="post" enctype="multipart/form-data">
     <p>
         <label for="email">To:</label>
@@ -113,7 +114,7 @@
         <textarea id="attachment" name="attachment" th:text="*{attachment}" Optional></textarea>
     </p>
     <p>
-        <button type="submit">Send Email</button>
+        <button  class="back-button"  type="submit">Send Email</button>
     </p>
 </form>
 
